@@ -1,10 +1,8 @@
 "use client";
 
-export default function StatusBadge({
-  status,
-}: {
-  status: "Podnet" | "U obradi" | "Odobren";
-}) {
+type StatusZahteva = "Podnet" | "U obradi" | "Završen";
+
+export default function StatusBadge({ status }: { status: StatusZahteva }) {
   const color =
     status === "Podnet"
       ? "bg-yellow-200"
@@ -12,5 +10,9 @@ export default function StatusBadge({
       ? "bg-blue-200"
       : "bg-green-200";
 
-  return <span className={`px-2 py-1 rounded ${color}`}>{status}</span>;
+  return (
+    <span className={`px-2 py-1 rounded ${color}`}>
+      {status}
+    </span>
+  );
 }
