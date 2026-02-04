@@ -1,110 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { requests, students, requestTypes } from "@/db/schema";
+import { requests, students } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { proveraAuth } from "@/lib/auth";
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const korisnik = await proveraAuth();
-
-    if (!korisnik) {
-      return NextResponse.json(
-        { error: "Niste prijavljeni" },
-        { status: 401 }
-      );
-    }
-
-    const { id } = await params;
-    const zahtevId = parseInt(id);
-
-    const [zahtev] = await db
-      .select({
-        id: requests.id,
-        status: requests.status,
-        purpose: requests.purpose,
-        note: requests.note,
-        createdAt: requests.createdAt,
-        requestType: {
-          id: requestTypes.id,
-          name: requestTypes.name,
-        },
-        student: {
-          firstName: students.firstName,
-          lastName: students.lastName,
-          indexNumber: students.indexNumber,
-        },
-      })
-      .from(requests)
-      .leftJoin(requestTypes, eq(requests.requestTypeId, requestTypes.id))
-      .leftJoin(students, eq(requests.studentId, students.id))
-      .where(eq(requests.id, zahtevId));
-
-    if (!zahtev) {
-      return NextResponse.json(
-        { error: "Zahtev nije pronadjen" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ request: zahtev });
-  } catch (error) {
-    console.error("Greska:", error);
-    return NextResponse.json(
-      { error: "Greska na serveru" },
-      { status: 500 }
-    );
-  }
-}
-
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const korisnik = await proveraAuth();
-
-    if (!korisnik) {
-      return NextResponse.json(
-        { error: "Niste prijavljeni" },
-        { status: 401 }
-      );
-    }
-
-    if (korisnik.role === "STUDENT") {
-      return NextResponse.json(
-        { error: "Nemate dozvolu" },
-        { status: 403 }
-      );
-    }
-
-    const { id } = await params;
-    const zahtevId = parseInt(id);
-    const body = await request.json();
-
-    await db
-      .update(requests)
-      .set({
-        status: body.status,
-        note: body.note,
-        processedBy: korisnik.userId,
-      })
-      .where(eq(requests.id, zahtevId));
-
-    return NextResponse.json({ message: "Zahtev azuriran" });
-  } catch (error) {
-    console.error("Greska:", error);
-    return NextResponse.json(
-      { error: "Greska na serveru" },
-      { status: 500 }
-    );
-  }
-}
-
 
 export async function DELETE(
   request: NextRequest,
@@ -121,50 +19,120 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const zahtevId = parseInt(id);
+    const requestId = parseInt(id);
 
-
-    const [postojeci] = await db
-      .select()
-      .from(requests)
-      .where(eq(requests.id, zahtevId));
-
-    if (!postojeci) {
+    if (isNaN(requestId)) {
       return NextResponse.json(
-        { error: "Zahtev nije pronadjen" },
-        { status: 404 }
+        { error: "Nevažeći ID zahteva" },
+        { status: 400 }
       );
     }
 
+    const [zahtev] = await db
+      .select()
+      .from(requests)
+      .where(eq(requests.id, requestId));
+
+    if (!zahtev) {
+      return NextResponse.json(
+        { error: "Zahtev nije pronađen" },
+        { status: 404 }
+      );
+    }
 
     if (korisnik.role === "STUDENT") {
       const [student] = await db
         .select()
         .from(students)
-        .where(eq(students.userId, korisnik.userId));
+        .where(eq(students.userId, korisnik.sub));
 
-      if (postojeci.studentId !== student?.id) {
+      if (!student || zahtev.studentId !== student.id) {
         return NextResponse.json(
-          { error: "Ne mozete obrisati tudji zahtev" },
+          { error: "Nemate dozvolu za brisanje ovog zahteva" },
           { status: 403 }
         );
       }
 
-      if (postojeci.status !== "PENDING") {
+      if (zahtev.status !== "PENDING") {
         return NextResponse.json(
-          { error: "Mozete obrisati samo zahteve na cekanju" },
-          { status: 400 }
+          { error: "Možete obrisati samo zahteve koji čekaju obradu" },
+          { status: 403 }
         );
       }
     }
 
-    await db.delete(requests).where(eq(requests.id, zahtevId));
+    await db.delete(requests).where(eq(requests.id, requestId));
 
-    return NextResponse.json({ message: "Zahtev obrisan" });
+    return NextResponse.json({ message: "Zahtev uspešno obrisan" });
   } catch (error) {
-    console.error("Greska:", error);
+    console.error("Greška pri brisanju:", error);
     return NextResponse.json(
-      { error: "Greska na serveru" },
+      { error: "Greška na serveru" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const korisnik = await proveraAuth();
+
+    if (!korisnik) {
+      return NextResponse.json(
+        { error: "Niste prijavljeni" },
+        { status: 401 }
+      );
+    }
+
+    if (korisnik.role !== "STAFF" && korisnik.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Nemate dozvolu za ovu akciju" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const requestId = parseInt(id);
+
+    if (isNaN(requestId)) {
+      return NextResponse.json(
+        { error: "Nevažeći ID zahteva" },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { status, note } = body;
+
+    const [zahtev] = await db
+      .select()
+      .from(requests)
+      .where(eq(requests.id, requestId));
+
+    if (!zahtev) {
+      return NextResponse.json(
+        { error: "Zahtev nije pronađen" },
+        { status: 404 }
+      );
+    }
+
+    const updateData: { status?: string; note?: string } = {};
+    if (status) updateData.status = status;
+    if (note !== undefined) updateData.note = note;
+
+    await db
+      .update(requests)
+      .set(updateData)
+      .where(eq(requests.id, requestId));
+
+    return NextResponse.json({ message: "Zahtev uspešno ažuriran" });
+  } catch (error) {
+    console.error("Greška pri ažuriranju:", error);
+    return NextResponse.json(
+      { error: "Greška na serveru" },
       { status: 500 }
     );
   }

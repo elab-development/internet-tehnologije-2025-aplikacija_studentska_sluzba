@@ -21,7 +21,7 @@ export async function GET() {
       const [student] = await db
         .select()
         .from(students)
-        .where(eq(students.userId, korisnik.userId));
+        .where(eq(students.userId, korisnik.sub));
 
       if (!student) {
         return NextResponse.json(
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const [student] = await db
       .select()
       .from(students)
-      .where(eq(students.userId, korisnik.userId));
+      .where(eq(students.userId, korisnik.sub));
 
     if (!student) {
       return NextResponse.json(

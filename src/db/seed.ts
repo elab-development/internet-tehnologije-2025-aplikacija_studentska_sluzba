@@ -4,19 +4,17 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { users, students, staff, requestTypes } from "./schema";
 
-
 async function seed() {
   console.log("Pokrecem unosenje podataka...");
 
- 
   const connection = await mysql.createConnection({
     uri: process.env.DATABASE_URL,
   });
+
   const db = drizzle(connection);
 
   try {
     console.log("Dodajem tipove zahteva...");
-    
     await db.insert(requestTypes).values([
       {
         name: "Uverenje o studiranju",
@@ -51,10 +49,8 @@ async function seed() {
     ]);
     console.log("Tipovi zahteva dodati!");
 
-    
     console.log("Kreiranje admin naloga...");
     const adminSifra = await bcrypt.hash("admin123", 10);
-    
     await db.insert(users).values({
       email: "admin@fon.bg.ac.rs",
       password: adminSifra,
@@ -62,10 +58,8 @@ async function seed() {
     });
     console.log("Admin kreiran!");
 
-    
     console.log("Kreiranje sluzbenika...");
     const sluzbSifra = await bcrypt.hash("staff123", 10);
-    
     const sluzbResult = await db.insert(users).values({
       email: "sluzbenik@fon.bg.ac.rs",
       password: sluzbSifra,
@@ -80,10 +74,8 @@ async function seed() {
     });
     console.log("Sluzbenik kreiran!");
 
-    
     console.log("Kreiranje test studenta...");
     const studSifra = await bcrypt.hash("student123", 10);
-    
     const studResult = await db.insert(users).values({
       email: "student@student.fon.bg.ac.rs",
       password: studSifra,
@@ -93,14 +85,12 @@ async function seed() {
     await db.insert(students).values({
       firstName: "Petar",
       lastName: "Petrovic",
-      indexNumber: "2021/0001",
-      yearOfStudy: 3,
-      phone: "0641234567",
+      indexNumber: "2024/0001",
+      yearOfStudy: 2,
       userId: studResult[0].insertId,
     });
     console.log("Student kreiran!");
 
-    
     console.log("");
     console.log("=== UNOSENJE ZAVRSENO ===");
     console.log("");

@@ -50,7 +50,7 @@ export function cookieOpts() {
 }
 
 export async function proveraAuth(): Promise<JwtUserClaims | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE)?.value;
 
   if (!token) {
