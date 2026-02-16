@@ -73,6 +73,8 @@ export default function StudentPage() {
     ucitajPodatke();
   }, [status, router]);
 
+
+
   const podneziZahtev = async () => {
     if (!noviZahtevTip) {
       setPoruka({ tekst: "Izaberite tip zahteva", tip: "greska" });
@@ -111,6 +113,9 @@ export default function StudentPage() {
       setPoruka({ tekst: "Greška pri povezivanju sa serverom", tip: "greska" });
     }
   };
+
+
+
 
   const obrisiZahtev = async (id: number) => {
     if (!confirm("Da li ste sigurni da želite da obrišete zahtev?")) {
@@ -182,6 +187,9 @@ export default function StudentPage() {
             {poruka.tekst}
           </div>
         )}
+
+
+        
 
         {!prikaziFormu && (
           <button
