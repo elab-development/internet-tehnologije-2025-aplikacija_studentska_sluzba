@@ -41,7 +41,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-5xl font-extrabold mb-6 leading-tight">
-              🎓 Studentska Služba
+               Studentska Služba
             </h1>
             <p className="text-xl text-blue-200 mb-8 leading-relaxed">
               Fakultet organizacionih nauka — Univerzitet u Beogradu.
@@ -60,7 +60,7 @@ export default function Home() {
                 href="/api-docs"
                 className="border-2 border-white text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-700 transition"
               >
-                📄 API Dokumentacija
+                Dokumentacija
               </Link>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function Home() {
 
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              📅 Neradni dani
+              Neradni dani
             </h2>
             <HolidaysWidget />
             <p className="text-sm text-gray-400 mt-2">
@@ -109,7 +109,7 @@ export default function Home() {
 
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              📋 Kako funkcioniše?
+              Kako funkcioniše?
             </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-4 bg-white p-4 rounded-lg shadow">
@@ -176,37 +176,37 @@ export default function Home() {
       <section className="bg-white py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">
-            📝 Tipovi zahteva koje podržavamo
+            Tipovi zahteva koje podržavamo
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               {
-                icon: "📜",
+               
                 title: "Uverenje o studiranju",
                 desc: "Potvrda aktivnog statusa studenta",
               },
               {
-                icon: "📊",
+                
                 title: "Prepis ocena",
                 desc: "Lista svih položenih ispita sa ocenama",
               },
               {
-                icon: "🎓",
+                
                 title: "Potvrda o diplomiranju",
                 desc: "Potvrda o završetku studija",
               },
               {
-                icon: "🔄",
+                
                 title: "Obnova godine",
                 desc: "Zahtev za obnavljanje školske godine",
               },
               {
-                icon: "📋",
+                
                 title: "Prijava ispita",
                 desc: "Prijava za polaganje ispita u roku",
               },
               {
-                icon: "📨",
+                
                 title: "Ostali zahtevi",
                 desc: "Svi drugi zahtevi ka studentskoj službi",
               },
@@ -215,7 +215,7 @@ export default function Home() {
                 key={i}
                 className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition"
               >
-                <span className="text-3xl">{item.icon}</span>
+                
                 <h3 className="font-semibold text-gray-800 mt-2">
                   {item.title}
                 </h3>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import DocumentGenerator from "@/components/DocumentGenerator";
 
 interface TipZahteva {
   id: number;
@@ -73,8 +74,6 @@ export default function StudentPage() {
     ucitajPodatke();
   }, [status, router]);
 
-
-
   const podneziZahtev = async () => {
     if (!noviZahtevTip) {
       setPoruka({ tekst: "Izaberite tip zahteva", tip: "greska" });
@@ -113,9 +112,6 @@ export default function StudentPage() {
       setPoruka({ tekst: "Greška pri povezivanju sa serverom", tip: "greska" });
     }
   };
-
-
-
 
   const obrisiZahtev = async (id: number) => {
     if (!confirm("Da li ste sigurni da želite da obrišete zahtev?")) {
@@ -188,8 +184,9 @@ export default function StudentPage() {
           </div>
         )}
 
-
-        
+        <div className="mb-6">
+          <DocumentGenerator />
+        </div>
 
         {!prikaziFormu && (
           <button

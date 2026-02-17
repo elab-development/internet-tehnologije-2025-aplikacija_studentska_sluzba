@@ -19,6 +19,8 @@
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.16.2",
     "next": "16.1.4",
+    "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -27,6 +29,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
+    "@types/pdfkit": "^0.17.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.8",
