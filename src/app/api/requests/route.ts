@@ -1,3 +1,56 @@
+/**
+ * @swagger
+ * /api/requests:
+ *   get:
+ *     summary: Preuzmi sve zahteve
+ *     description: Vraća listu svih zahteva. Admin i službenici vide sve, studenti samo svoje.
+ *     tags:
+ *       - Requests
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista zahteva
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 requests:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Request'
+ *       401:
+ *         description: Korisnik nije prijavljen
+ *   post:
+ *     summary: Kreiraj novi zahtev
+ *     description: Student podnosi novi zahtev studentskoj službi
+ *     tags:
+ *       - Requests
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - requestTypeId
+ *             properties:
+ *               requestTypeId:
+ *                 type: integer
+ *                 example: 1
+ *               description:
+ *                 type: string
+ *                 example: "Potrebno uverenje za stipendiju"
+ *     responses:
+ *       201:
+ *         description: Zahtev uspešno kreiran
+ *       401:
+ *         description: Korisnik nije prijavljen
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { requests, students, requestTypes } from "@/db/schema";
