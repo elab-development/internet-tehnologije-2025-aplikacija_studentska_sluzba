@@ -32,7 +32,6 @@
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-// ... ostatak postojećeg koda ostaje isti
 
 import { NextResponse } from "next/server";
 import { db } from "@/db";
@@ -40,6 +39,7 @@ import { users, students, staff } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { AUTH_COOKIE, cookieOpts, signAuthToken } from "@/lib/auth";
+import { sanitizeInput } from "@/lib/sanitize";
 
 type Body = {
   email: string;
@@ -57,6 +57,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const cleanEmail = sanitizeInput(email);
+    const cleanPassword = sanitizeInput(password);
+
     const [korisnik] = await db
       .select({
         id: users.id,
@@ -65,7 +68,7 @@ export async function POST(req: Request) {
         role: users.role,
       })
       .from(users)
-      .where(eq(users.email, email));
+      .where(eq(users.email, cleanEmail));
 
     if (!korisnik) {
       return NextResponse.json(
@@ -74,7 +77,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const lozinkaOk = await bcrypt.compare(password, korisnik.password);
+    const lozinkaOk = await bcrypt.compare(cleanPassword, korisnik.password);
     if (!lozinkaOk) {
       return NextResponse.json(
         { error: "Pogrešan email ili lozinka" },
