@@ -1,4 +1,5 @@
 "use client";
+import QRCodeWidget from "@/components/QRCodeWidget";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -290,6 +291,15 @@ export default function StudentPage() {
                         </div>
                       )}
                     </div>
+
+                    <div className="mt-4">
+                      <QRCodeWidget
+                        data={`zahtev-${zahtev.id}`}
+                        size={120}
+                        label="QR kod za verifikaciju zahteva"
+                      />
+                    </div>
+
 
                     <div className="flex items-center gap-4 ml-4">
                       <span
