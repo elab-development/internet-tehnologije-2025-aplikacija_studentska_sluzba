@@ -1,9 +1,45 @@
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Prijava korisnika
+ *     description: Autentifikuje korisnika pomoću email-a i lozinke
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Uspešna prijava
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Uspešna prijava"
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Pogrešan email ili lozinka
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, students, staff } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { AUTH_COOKIE, cookieOpts, signAuthToken } from "@/lib/auth";
+import { sanitizeInput } from "@/lib/sanitize";
 
 type Body = {
   email: string;
@@ -21,6 +57,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const cleanEmail = sanitizeInput(email);
+    const cleanPassword = sanitizeInput(password);
+
     const [korisnik] = await db
       .select({
         id: users.id,
@@ -29,7 +68,7 @@ export async function POST(req: Request) {
         role: users.role,
       })
       .from(users)
-      .where(eq(users.email, email));
+      .where(eq(users.email, cleanEmail));
 
     if (!korisnik) {
       return NextResponse.json(
@@ -38,7 +77,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const lozinkaOk = await bcrypt.compare(password, korisnik.password);
+    const lozinkaOk = await bcrypt.compare(cleanPassword, korisnik.password);
     if (!lozinkaOk) {
       return NextResponse.json(
         { error: "Pogrešan email ili lozinka" },
