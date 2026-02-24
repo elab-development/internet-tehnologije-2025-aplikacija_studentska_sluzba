@@ -3,6 +3,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "npm start"
+    "startCommand": "npx tsx src/db/seed.ts && npm start"
   }
 }
