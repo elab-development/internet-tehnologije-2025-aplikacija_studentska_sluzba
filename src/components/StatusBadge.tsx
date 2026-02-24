@@ -1,6 +1,11 @@
 "use client";
 
-type StatusZahteva = "Podnet" | "U obradi" | "Završen";
+export type StatusZahteva =
+  | "Podnet"
+  | "U obradi"
+  | "Odobren"
+  | "Odbijen"
+  | "Završen";
 
 export default function StatusBadge({ status }: { status: StatusZahteva }) {
   const color =

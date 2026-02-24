@@ -73,6 +73,15 @@ export async function DELETE(
   }
 }
 
+type RequestStatus = "PENDING" | "IN_PROGRESS" | "APPROVED" | "REJECTED" | "COMPLETED";
+
+const isRequestStatus = (s: unknown): s is RequestStatus =>
+  s === "PENDING" ||
+  s === "IN_PROGRESS" ||
+  s === "APPROVED" ||
+  s === "REJECTED" ||
+  s === "COMPLETED";
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -119,9 +128,18 @@ export async function PATCH(
       );
     }
 
-    const updateData: { status?: string; note?: string } = {};
-    if (status) updateData.status = status;
-    if (note !== undefined) updateData.note = note;
+    const updateData: { status?: RequestStatus; note?: string } = {};
+
+    if (status !== undefined) {
+      if (!isRequestStatus(status)) {
+        return NextResponse.json({ error: "Nevalidan status" }, { status: 400 });
+      }
+      updateData.status = status;
+    }
+
+    if (note !== undefined) {
+      updateData.note = String(note);
+    }
 
     await db
       .update(requests)

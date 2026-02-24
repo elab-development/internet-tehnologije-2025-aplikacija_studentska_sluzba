@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import StatusBadge from "@/components/StatusBadge";
 import AppButton from "@/components/AppButton";
+import {StatusZahteva} from "@/components/StatusBadge";
 
 interface Zahtev {
   id: number;
@@ -66,16 +67,17 @@ export default function StaffPage() {
     ucitajZahteve();
   }, [status, router]);
 
-  const mapirajStatus = (status: string): string => {
-    const mapa: { [key: string]: string } = {
-      PENDING: "Podnet",
-      IN_PROGRESS: "U obradi",
-      APPROVED: "Odobren",
-      REJECTED: "Odbijen",
-      COMPLETED: "Završen",
-    };
-    return mapa[status] || status;
+  const mapirajStatus = (status: string): StatusZahteva => {
+  const mapa: Record<string, StatusZahteva> = {
+    PENDING: "Podnet",
+    IN_PROGRESS: "U obradi",
+    APPROVED: "Odobren",
+    REJECTED: "Odbijen",
+    COMPLETED: "Završen",
   };
+
+  return mapa[status] ?? "Podnet";
+};
 
   const filtriraniZahtevi = zahtevi.filter((z) => {
     const statusMapped = mapirajStatus(z.status);
