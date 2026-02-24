@@ -65,9 +65,33 @@ jobs:
       - name: Instaliraj zavisnosti
         run: npm ci
 
+      - name: Build aplikacije
+        run: npm run build
+        env:
+          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+          JWT_SECRET: test-secret-key-for-ci
+
+      - name: Start aplikacije (background)
+        run: |
+          npm run start -- --port 3000 &
+          echo $! > next_pid.txt
+
+      - name: Sačekaj da server radi
+        run: |
+          for i in {1..30}; do
+            curl -sSf http://localhost:3000/ >/dev/null && exit 0
+            sleep 2
+          done
+          echo "Server nije startovao na vreme" && exit 1
+
       - name: Pokreni testove
         run: npm run test
         env:
-          DATABASE_URL: mysql://root:testpassword@localhost:3306/studentska_sluzba_test
+          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
           JWT_SECRET: test-secret-key-for-ci
           TEST_URL: http://localhost:3000
+
+      - name: Stop aplikacije
+        if: always()
+        run: |
+          kill $(cat next_pid.txt) || true
