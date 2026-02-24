@@ -11,7 +11,7 @@ import { describe, it, expect } from "vitest";
 
 const BASE_URL = process.env.TEST_URL || "http://localhost:3000";
 
-// testovi za Auth API
+
 describe("Auth API", () => {
   it("POST /api/auth/login - odbija pogrešne kredencijale", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -39,13 +39,16 @@ describe("Auth API", () => {
     expect(res.status).toBeGreaterThanOrEqual(400);
   });
 
-  it("GET /api/auth/me - vraća 200 ili 401 (zavisi od sesije)", async () => {
+  it("GET /api/auth/me - vraća user:null bez sesije", async () => {
   const res = await fetch(`${BASE_URL}/api/auth/me`);
-  expect([200, 401]).toContain(res.status);
+  expect(res.status).toBe(200);
+
+  const data = await res.json();
+  expect(data.user).toBeNull();
   });
 });
 
-// testovi za Request Types API
+
 describe("Request Types API", () => {
   it("GET /api/request-types - vraća listu tipova", async () => {
     const res = await fetch(`${BASE_URL}/api/request-types`);
@@ -57,7 +60,7 @@ describe("Request Types API", () => {
   });
 });
 
-// testovi za Requests API
+
 describe("Requests API", () => {
   it("GET /api/requests - vraća 401 bez sesije", async () => {
     const res = await fetch(`${BASE_URL}/api/requests`);
@@ -78,18 +81,20 @@ describe("Requests API", () => {
   });
 });
 
-// testovi za Stats API
+
 describe("Stats API", () => {
   it("GET /api/stats - vraća statistike", async () => {
-    const res = await fetch(`${BASE_URL}/api/stats/charts`);
+    const res = await fetch(`${BASE_URL}/api/stats`);
     expect(res.status).toBe(200);
 
     const data = await res.json();
-    expect(data).toBeDefined();
+    expect(data.totalRequests).toBeDefined();
+    expect(data.completedRequests).toBeDefined();
+    expect(data.avgProcessingDays).toBeDefined();
   });
 });
 
-// testovi za eksterni Holidays API
+
 describe("Holidays API", () => {
   it("GET /api/holidays - vraća praznike za RS", async () => {
     const res = await fetch(`${BASE_URL}/api/holidays?country=RS&year=2026`);
@@ -102,7 +107,7 @@ describe("Holidays API", () => {
   });
 });
 
-// testovi za Documents API
+
 describe("Documents API", () => {
   it("POST /api/documents/generate - generiše PDF", async () => {
     const res = await fetch(`${BASE_URL}/api/documents/generate`, {
@@ -117,7 +122,7 @@ describe("Documents API", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(res.headers.get("content-type")).toBe("application/pdf");
+    expect(res.headers.get("content-type") || "").toContain("application/pdf");
   });
 
   it("POST /api/documents/generate - odbija bez podataka", async () => {

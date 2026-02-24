@@ -45,7 +45,7 @@ export function cookieOpts() {
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 dana
+    maxAge: 60 * 60 * 24 * 7, 
   };
 }
 

@@ -7,7 +7,6 @@ import { AUTH_COOKIE, verifyAuthToken } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // ✅ cookies() je async
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE)?.value;
 
