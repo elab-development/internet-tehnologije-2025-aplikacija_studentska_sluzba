@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          DATABASE_URL: mysql://test:test@localhost:3306/test
+          DATABASE_URL: mysql://test:test@127.0.0.1:3306/test
           JWT_SECRET: test-secret-key-for-ci
 
   test:
@@ -47,10 +47,10 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -ptestpassword"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10
 
     steps:
       - name: Checkout kod
@@ -65,10 +65,13 @@ jobs:
       - name: Instaliraj zavisnosti
         run: npm ci
 
+      - name: Install mysql client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
       - name: Sačekaj MySQL
         run: |
           for i in {1..30}; do
-            mysqladmin ping -hmysql -uroot -ptestpassword && exit 0
+            mysqladmin ping -h 127.0.0.1 -uroot -ptestpassword --silent && exit 0
             sleep 2
           done
           echo "MySQL nije startovao na vreme" && exit 1
@@ -76,23 +79,26 @@ jobs:
       - name: Push schema u bazu
         run: npm run db:push
         env:
-          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+          DATABASE_URL: mysql://root:testpassword@127.0.0.1:3306/studentska_sluzba_test
 
       - name: Seed baze
         run: npm run db:seed
         env:
-          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+          DATABASE_URL: mysql://root:testpassword@127.0.0.1:3306/studentska_sluzba_test
 
       - name: Build aplikacije
         run: npm run build
         env:
-          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+          DATABASE_URL: mysql://root:testpassword@127.0.0.1:3306/studentska_sluzba_test
           JWT_SECRET: test-secret-key-for-ci
 
       - name: Start aplikacije (background)
         run: |
           npm run start -- --port 3000 &
           echo $! > next_pid.txt
+        env:
+          DATABASE_URL: mysql://root:testpassword@127.0.0.1:3306/studentska_sluzba_test
+          JWT_SECRET: test-secret-key-for-ci
 
       - name: Sačekaj da server radi
         run: |
@@ -105,8 +111,6 @@ jobs:
       - name: Pokreni testove
         run: npm run test
         env:
-          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
-          JWT_SECRET: test-secret-key-for-ci
           TEST_URL: http://localhost:3000
 
       - name: Stop aplikacije
