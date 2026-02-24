@@ -65,6 +65,24 @@ jobs:
       - name: Instaliraj zavisnosti
         run: npm ci
 
+      - name: Sačekaj MySQL
+        run: |
+          for i in {1..30}; do
+            mysqladmin ping -hmysql -uroot -ptestpassword && exit 0
+            sleep 2
+          done
+          echo "MySQL nije startovao na vreme" && exit 1
+
+      - name: Push schema u bazu
+        run: npm run db:push
+        env:
+          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+
+      - name: Seed baze
+        run: npm run db:seed
+        env:
+          DATABASE_URL: mysql://root:testpassword@mysql:3306/studentska_sluzba_test
+
       - name: Build aplikacije
         run: npm run build
         env:
