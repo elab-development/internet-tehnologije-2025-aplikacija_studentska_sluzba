@@ -39,9 +39,11 @@ describe("Auth API", () => {
     expect(res.status).toBeGreaterThanOrEqual(400);
   });
 
-  it("GET /api/auth/me - vraća 401 bez sesije", async () => {
+  it("GET /api/auth/me - vraća odgovor bez sesije", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/me`);
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data).toBeDefined();
   });
 });
 

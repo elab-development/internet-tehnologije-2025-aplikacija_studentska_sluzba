@@ -4,6 +4,7 @@ import QRCodeWidget from "@/components/QRCodeWidget";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import DocumentGenerator from "@/components/DocumentGenerator";
 
 interface TipZahteva {
   id: number;
@@ -183,6 +184,10 @@ export default function StudentPage() {
             {poruka.tekst}
           </div>
         )}
+
+        <div className="mb-6">
+          <DocumentGenerator />
+        </div>
 
         {!prikaziFormu && (
           <button
