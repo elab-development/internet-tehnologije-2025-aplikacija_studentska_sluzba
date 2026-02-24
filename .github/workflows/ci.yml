@@ -1,0 +1,73 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kod
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instaliraj zavisnosti
+        run: npm ci
+
+      - name: TypeScript provera
+        run: npx tsc --noEmit --skipLibCheck
+
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: mysql://test:test@localhost:3306/test
+          JWT_SECRET: test-secret-key-for-ci
+
+  test:
+    name: Testovi
+    runs-on: ubuntu-latest
+    needs: build 
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: studentska_sluzba_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout kod
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instaliraj zavisnosti
+        run: npm ci
+
+      - name: Pokreni testove
+        run: npm run test
+        env:
+          DATABASE_URL: mysql://root:testpassword@localhost:3306/studentska_sluzba_test
+          JWT_SECRET: test-secret-key-for-ci
+          TEST_URL: http://localhost:3000
