@@ -23,6 +23,7 @@ services:
       dockerfile: Dockerfile
     container_name: studentska_app
     restart: always
+    command: npm run dev
     ports:
       - "3000:3000"
     environment:
