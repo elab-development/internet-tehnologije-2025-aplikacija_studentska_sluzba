@@ -18,31 +18,31 @@ Potreban softver:
 
 1. Klonirajte repozitorijum:
 bash
-git clone https://github.com/VAS_USERNAME/internet-tehnologije-2025-aplikacija_studentska_sluzba.git
-cd internet-tehnologije-2025-aplikacija_studentska_sluzba
+```git clone https://github.com/elab-development/internet-tehnologije-2025-aplikacija_studentska_sluzba.git```
+```cd internet-tehnologije-2025-aplikacija_studentska_sluzba```
 
 
 2. Napravite .env fajl u root folderu i dodajte:
 env
-DATABASE_URL=mysql://root:password@db:3306/studentska_sluzba
-JWT_SECRET=vas_tajni_kljuc
+```DATABASE_URL=mysql://root:password@db:3306/studentska_sluzba```
+```JWT_SECRET=vas_tajni_kljuc```
 
 
 3. Pokrenite aplikaciju:
 bash
-docker-compose up --build
+```docker-compose up --build```
 
 
 4. Sačekajte da se u terminalu pojavi poruka ✓ Ready in Xs, a zatim u novom terminalu pokrenite seed baze:
 bash
-docker-compose exec app npm run db:seed
+```docker-compose exec app npm run db:seed```
 
 
 5. Otvorite browser i idite na http://localhost:3000
 
 Za zaustavljanje aplikacije koristite:
 bash
-docker-compose down
+```docker-compose down```
 
 
 ## Način upotrebe
@@ -77,7 +77,7 @@ Nakon pokretanja aplikacije, dostupni su sledeći test nalozi:
 
 ### Pokretanje testova:
 bash
-docker-compose exec app npm run test
+```docker-compose exec app npm run test```
 
 
 ### API dokumentacija:
@@ -98,11 +98,12 @@ Swagger dokumentacija je dostupna na http://localhost:3000/api-docs nakon pokret
 - *Swagger* — API dokumentacija
 
 ### Eksterni API-ji:
-- *Nager.Date API* — dohvata državne praznike za Srbiju (prikazuje se na početnoj stranici)
+- *Nager.Date API* — prikaz državnih praznika za Srbiju (prikazuje se na početnoj stranici)
 - *goqr.me API* — generiše QR kodove za verifikaciju dokumenata
 
 ## Struktura projekta
 
+```
 src/
 ├── app/
 │   ├── (admin)/admin/          — admin dashboard
@@ -122,7 +123,7 @@ src/
 ├── components/                 — React komponente (widgeti, forme)
 ├── db/                         — šema baze, konekcija, seed
 └── lib/                        — pomoćne funkcije (security, swagger)
-
+```
 
 ## Git strategija
 
@@ -130,7 +131,7 @@ Koristili smo sledeću strategiju grananja:
 - main — stabilna verzija aplikacije
 - develop — integraciona grana za testiranje pre merge-a u main
 - feature/swagger-security — grana za Swagger, bezbednost, testove i CI/CD
-- feature/external-apis — grana za eksterne API-je, vizualizaciju i README
+- feature/external-apis-visualization — grana za eksterne API-je, vizualizaciju i README
 - feature/homepage-docs — grana za početnu stranicu, PDF generisanje i admin dashboard
 
 Svaka feature grana se po završetku merge-uje u develop, a develop u main.
